@@ -8,9 +8,8 @@ import {
 } from '@/lib/api/species-route-helpers';
 import type { SpeciesWithDetails } from '@/types/species';
 
-interface RouteParams {
-  params: { identifier: string };
-}
+// Next.js 16: route handler context params are now a Promise
+type Params = Promise<{ identifier: string }>;
 
 const isUuid = (value: string) =>
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(
@@ -22,17 +21,17 @@ const resolveIdentifierColumn = (identifier: string) =>
 
 const enrichSpeciesRecord = async (speciesId: string) => {
   const [{ data: taxonomy }, { data: conservation }, { data: images }] = await Promise.all([
-    supabaseAdmin
+    (supabaseAdmin as any)
       .from('taxonomy_hierarchy')
       .select('*')
       .eq('species_id', speciesId)
       .maybeSingle(),
-    supabaseAdmin
+    (supabaseAdmin as any)
       .from('conservation_data')
       .select('*')
       .eq('species_id', speciesId)
       .maybeSingle(),
-    supabaseAdmin
+    (supabaseAdmin as any)
       .from('species_images')
       .select('*')
       .eq('species_id', speciesId)
@@ -42,11 +41,11 @@ const enrichSpeciesRecord = async (speciesId: string) => {
   return { taxonomy, conservation, images: images ?? [] };
 };
 
-export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const identifier = params.identifier;
+export async function GET(_request: NextRequest, context: { params: Params }) {
+  const { identifier } = await context.params;
   const column = resolveIdentifierColumn(identifier);
 
-  const { data: species, error } = await supabaseAdmin
+  const { data: species, error } = await (supabaseAdmin as any)
     .from('species')
     .select('*')
     .eq(column, identifier)
@@ -67,8 +66,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   });
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { userId } = auth();
+export async function PUT(request: NextRequest, context: { params: Params }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -84,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const identifier = params.identifier;
+  const { identifier } = await context.params;
   const column = resolveIdentifierColumn(identifier);
 
   const body = await request.json();
@@ -104,7 +103,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     updates.slug = slugify(updates.scientific_name);
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await (supabaseAdmin as any)
     .from('species')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq(column, identifier)

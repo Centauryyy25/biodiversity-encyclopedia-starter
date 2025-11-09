@@ -39,3 +39,6 @@ echo ".env" >> .gitignore
 next-env.d.ts
 .env
 .env.local
+
+# clerk configuration (can include secrets)
+/.clerk/

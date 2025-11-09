@@ -9,5 +9,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export function createClient() {
-  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createSupabaseClient<Database>(supabaseUrl as string, supabaseAnonKey as string);
 }

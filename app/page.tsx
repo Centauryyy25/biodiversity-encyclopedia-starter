@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Search, Leaf, Globe, BookOpen, Users, Camera } from 'lucide-react';
+import { Leaf, Globe, BookOpen, Users, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import Image from 'next/image';
 import FeaturedSpeciesClient from '@/components/home/featured-species-client';
+import HomeSearch from '@/components/home/home-search';
 
 // Server Component
 export default function Home() {
@@ -15,7 +16,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="container mx-auto px-4 py-16 lg:py-24">
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto relative z-10">
             <h1 className="text-5xl lg:text-7xl font-serif text-[#DAF1DE] mb-6">
               FloraFauna
               <span className="block text-3xl lg:text-4xl font-sans text-[#8EB69B] mt-2">
@@ -31,15 +32,7 @@ export default function Home() {
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-2xl mx-auto mb-12">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8EB69B] h-5 w-5" />
-                <Input
-                  placeholder="Search species by name, taxonomy, or habitat..."
-                  className="pl-12 pr-4 py-4 text-lg bg-[#163832]/50 border-[#8EB69B]/30 text-[#DAF1DE] placeholder-[#8EB69B]/60 focus:border-[#8EB69B] focus:outline-none"
-                />
-              </div>
-            </div>
+            <HomeSearch className="max-w-2xl mx-auto mb-12" />
 
             {/* Quick Actions */}
             <div className="flex flex-wrap justify-center gap-4">
@@ -66,15 +59,15 @@ export default function Home() {
         </div>
 
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-5 pointer-events-none -z-10" aria-hidden>
           <div
-            className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%238EB69B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]`}
+            className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%238EB69B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] pointer-events-none`}
           ></div>
         </div>
       </section>
 
       {/* Featured Species Section */}
-      <section id="featured-species" className="py-16 lg:py-24 bg-[#163832]/20">
+      <section id="featured-species" className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-serif text-[#DAF1DE] mb-4">

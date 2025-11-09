@@ -214,16 +214,16 @@ export default function SpeciesCatalogClient({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(loading ? Array.from({ length: 6 }) : species).map((item, index) =>
-            loading ? (
-              <div
-                key={`skeleton-${index}`}
-                className="animate-pulse bg-[#163832]/40 border border-[#8EB69B]/10 rounded-xl h-64"
-              />
-            ) : (
-              <SpeciesCard key={item.id} species={item} />
-            )
-          )}
+          {loading
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="animate-pulse bg-[#163832]/40 border border-[#8EB69B]/10 rounded-xl h-64"
+                />
+              ))
+            : species.map((item) => (
+                <SpeciesCard key={item.id} species={item} />
+              ))}
         </div>
       )}
     </div>

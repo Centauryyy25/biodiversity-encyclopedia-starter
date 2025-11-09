@@ -9,15 +9,15 @@ import { ArrowLeft, MapPin, Shield, Info, Globe } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Next.js 16: params is a Promise and must be awaited
 interface SpeciesPageProps {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: SpeciesPageProps): Promise<Metadata> {
-  const { data: species } = await getSpeciesBySlug(params.slug);
+  const { slug } = await params;
+  const { data: species } = await getSpeciesBySlug(slug);
 
   if (!species) {
     return {
@@ -25,6 +25,25 @@ export async function generateMetadata({ params }: SpeciesPageProps): Promise<Me
       description: 'The requested species could not be found.',
     };
   }
+
+  const taxonomyKeywords = [
+    species.kingdom,
+    species.phylum,
+    species.class,
+    species.order,
+    species.family,
+  ].filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+  const keywords = [
+    species.scientific_name,
+    species.common_name,
+    ...taxonomyKeywords,
+    'biodiversity',
+    'conservation',
+    'taxonomy',
+    'flora',
+    'fauna',
+  ].filter((v): v is string => typeof v === 'string' && v.length > 0);
 
   return {
     title: `${species.common_name || species.scientific_name} - FloraFauna Encyclopedia`,
@@ -50,21 +69,13 @@ export async function generateMetadata({ params }: SpeciesPageProps): Promise<Me
       description: species.description || `Learn about ${species.scientific_name}`,
       images: species.image_urls?.[0] ? [species.image_urls[0]] : [],
     },
-    keywords: [
-      species.scientific_name,
-      species.common_name,
-      ...[species.kingdom, species.phylum, species.class, species.order, species.family].filter(Boolean),
-      'biodiversity',
-      'conservation',
-      'taxonomy',
-      'flora',
-      'fauna'
-    ].filter(Boolean),
+    keywords,
   };
 }
 
 export default async function SpeciesPage({ params }: SpeciesPageProps) {
-  const { data: species, error } = await getSpeciesBySlug(params.slug);
+  const { slug } = await params;
+  const { data: species, error } = await getSpeciesBySlug(slug);
 
   if (error || !species) {
     notFound();
@@ -360,7 +371,7 @@ export default async function SpeciesPage({ params }: SpeciesPageProps) {
                   <span className="text-[#8EB69B]">Conservation Status:</span>
                   <span className="text-[#DAF1DE]">{getStatusText(species.iucn_status)}</span>
                 </div>
-                {species.conservation?.habitat_protection !== null && (
+                {species.conservation && species.conservation.habitat_protection !== null && (
                   <>
                     <Separator className="bg-[#8EB69B]/20" />
                     <div className="flex justify-between text-sm">

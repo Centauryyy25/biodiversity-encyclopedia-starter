@@ -21,24 +21,49 @@ export const metadata: Metadata = {
     'Browse the FloraFauna encyclopedia to study detailed species profiles, taxonomy, and conservation data across kingdoms.',
 };
 
-const resolveBaseUrl = () => {
-  const headerStore = headers();
-  const forwardedProto = headerStore.get('x-forwarded-proto') ?? 'http';
-  const host = headerStore.get('host');
-
-  if (process.env.NEXT_PUBLIC_APP_URL) {
+const resolveBaseUrl = async () => {
+  // Prefer explicit env when available
+  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim() !== '') {
     return process.env.NEXT_PUBLIC_APP_URL;
   }
 
-  if (!host) {
-    return 'http://localhost:3000';
+  // Vercel provides VERCEL_URL without protocol
+  if (process.env.VERCEL_URL && process.env.VERCEL_URL.trim() !== '') {
+    const hostFromEnv = process.env.VERCEL_URL.replace(/^https?:\/\//, '');
+    return `https://${hostFromEnv}`;
   }
 
-  return `${forwardedProto}://${host}`;
+  // Fallback to request headers when available. Be defensive about shape.
+  try {
+    const headerStore: any = await headers();
+    const safeGet = (name: string): string | undefined => {
+      if (headerStore && typeof headerStore.get === 'function') {
+        return headerStore.get(name) ?? headerStore.get(name.toLowerCase());
+      }
+      if (headerStore && typeof headerStore === 'object') {
+        // Node IncomingHttpHeaders are lowercase keys
+        return headerStore[name.toLowerCase()] ?? headerStore[name];
+      }
+      return undefined;
+    };
+
+    const forwardedProto = safeGet('x-forwarded-proto') ?? 'http';
+    const forwardedHost = safeGet('x-forwarded-host');
+    const host = forwardedHost ?? safeGet('host');
+
+    if (host) {
+      return `${forwardedProto}://${host}`;
+    }
+  } catch {
+    // Ignore and fall through to localhost
+  }
+
+  // Final local fallback
+  return 'http://localhost:3000';
 };
 
 async function fetchInitialSpecies(): Promise<SpeciesListResponse> {
-  const baseUrl = resolveBaseUrl();
+  const baseUrl = await resolveBaseUrl();
 
   try {
     const response = await fetch(`${baseUrl}/api/species?limit=${PAGE_SIZE}`, {
