@@ -19,6 +19,9 @@ interface SpeciesCatalogClientProps {
   initialSpecies: Species[];
   initialCount: number;
   pageSize?: number;
+  initialSearch?: string;
+  initialKingdom?: string;
+  initialStatus?: string;
 }
 
 interface CatalogResponse {
@@ -51,15 +54,30 @@ export default function SpeciesCatalogClient({
   initialSpecies,
   initialCount,
   pageSize = 24,
+  initialSearch = '',
+  initialKingdom = 'all',
+  initialStatus = 'all',
 }: SpeciesCatalogClientProps) {
   const [species, setSpecies] = useState<Species[]>(initialSpecies);
   const [totalCount, setTotalCount] = useState(initialCount);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [kingdomFilter, setKingdomFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [kingdomFilter, setKingdomFilter] = useState(initialKingdom);
+  const [statusFilter, setStatusFilter] = useState(initialStatus);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    setSpecies(initialSpecies);
+    setTotalCount(initialCount);
+  }, [initialSpecies, initialCount]);
+
+  useEffect(() => {
+    setSearchTerm(initialSearch);
+    setKingdomFilter(initialKingdom);
+    setStatusFilter(initialStatus);
+    hasInitialized.current = false;
+  }, [initialSearch, initialKingdom, initialStatus]);
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -75,8 +93,9 @@ export default function SpeciesCatalogClient({
 
         const params = new URLSearchParams({ limit: String(pageSize) });
 
-        if (searchTerm.trim()) {
-          params.set('search', searchTerm.trim());
+        const trimmedSearch = searchTerm.trim();
+        if (trimmedSearch) {
+          params.set('search', trimmedSearch);
         }
 
         if (kingdomFilter !== 'all') {
@@ -121,13 +140,18 @@ export default function SpeciesCatalogClient({
   }, [searchTerm, kingdomFilter, statusFilter, pageSize]);
 
   const resetFilters = () => {
+    if (searchTerm === '' && kingdomFilter === 'all' && statusFilter === 'all') {
+      return;
+    }
     setSearchTerm('');
     setKingdomFilter('all');
     setStatusFilter('all');
-    setSpecies(initialSpecies);
-    setTotalCount(initialCount);
     setError(null);
   };
+
+  const trimmedSearchTerm = searchTerm.trim();
+  const isDefaultFilters =
+    trimmedSearchTerm === '' && kingdomFilter === 'all' && statusFilter === 'all';
 
   return (
     <div className="space-y-6">
@@ -181,7 +205,7 @@ export default function SpeciesCatalogClient({
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             <span>
               {totalCount} species match your filters
-              {searchTerm && ` for “${searchTerm}”`}
+              {trimmedSearchTerm && ` for “${trimmedSearchTerm}”`}
             </span>
           </div>
           <Button
@@ -189,9 +213,7 @@ export default function SpeciesCatalogClient({
             size="sm"
             onClick={resetFilters}
             className="text-[#8EB69B] hover:text-[#051F20]"
-            disabled={
-              !searchTerm && kingdomFilter === 'all' && statusFilter === 'all' && !error
-            }
+            disabled={isDefaultFilters && !error}
           >
             Reset filters
           </Button>

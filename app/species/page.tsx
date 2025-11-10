@@ -37,11 +37,31 @@ const resolveBaseUrl = () => {
   return `${forwardedProto}://${host}`;
 };
 
-async function fetchInitialSpecies(): Promise<SpeciesListResponse> {
+interface SpeciesFilters {
+  search?: string;
+  kingdom?: string;
+  status?: string;
+}
+
+async function fetchInitialSpecies(filters: SpeciesFilters): Promise<SpeciesListResponse> {
   const baseUrl = resolveBaseUrl();
 
   try {
-    const response = await fetch(`${baseUrl}/api/species?limit=${PAGE_SIZE}`, {
+    const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
+
+    if (filters.search) {
+      params.set('search', filters.search);
+    }
+
+    if (filters.kingdom) {
+      params.set('kingdom', filters.kingdom);
+    }
+
+    if (filters.status) {
+      params.set('iucn_status', filters.status);
+    }
+
+    const response = await fetch(`${baseUrl}/api/species?${params.toString()}`, {
       cache: 'no-store',
     });
 
@@ -60,8 +80,21 @@ async function fetchInitialSpecies(): Promise<SpeciesListResponse> {
   }
 }
 
-export default async function SpeciesPage() {
-  const initialPayload = await fetchInitialSpecies();
+export default async function SpeciesPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  const search = typeof searchParams?.search === 'string' ? searchParams.search : undefined;
+  const kingdom = typeof searchParams?.kingdom === 'string' ? searchParams.kingdom : undefined;
+  const status =
+    typeof searchParams?.iucn_status === 'string' ? searchParams.iucn_status : undefined;
+
+  const initialPayload = await fetchInitialSpecies({
+    search,
+    kingdom,
+    status,
+  });
   const initialSpecies = initialPayload.data ?? [];
   const initialCount = initialPayload.metadata?.count ?? initialSpecies.length;
 
@@ -94,6 +127,9 @@ export default async function SpeciesPage() {
           initialSpecies={initialSpecies}
           initialCount={initialCount}
           pageSize={PAGE_SIZE}
+          initialSearch={search ?? ''}
+          initialKingdom={kingdom ?? 'all'}
+          initialStatus={status ?? 'all'}
         />
       </div>
     </div>

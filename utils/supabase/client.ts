@@ -8,6 +8,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
+const client = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
+  global: {
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
+  },
+});
+
 export function createClient() {
-  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey);
+  return client;
 }

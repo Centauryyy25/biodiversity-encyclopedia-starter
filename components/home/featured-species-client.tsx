@@ -50,7 +50,7 @@ export default function FeaturedSpeciesClient() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
           <div key={i} className="animate-pulse">
             <div className="bg-[#163832]/50 border-[#8EB69B]/20 rounded-lg overflow-hidden">
               <div className="aspect-video bg-[#0B2B26]/50"></div>

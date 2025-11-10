@@ -1,80 +1,97 @@
 import { Suspense } from 'react';
-import { Search, Leaf, Globe, BookOpen, Users, Camera } from 'lucide-react';
+import { Globe, BookOpen, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import Image from 'next/image';
 import FeaturedSpeciesClient from '@/components/home/featured-species-client';
+import HeroSearch from '@/components/home/hero-search';
+import HeroActions from '@/components/home/hero-actions';
+import NewsletterForm from '@/components/home/newsletter-form';
+
+const CATEGORY_LINKS = [
+  {
+    title: 'Mammals',
+    description: 'Warm-blooded vertebrates with hair or fur',
+    icon: '🦁',
+    count: 39,
+    color: 'from-orange-600/20 to-red-600/20',
+    filters: { kingdom: 'Animalia', search: 'mammal' },
+  },
+  {
+    title: 'Birds',
+    description: 'Feathered vertebrates capable of flight',
+    icon: '🦅',
+    count: 50,
+    color: 'from-blue-600/20 to-cyan-600/20',
+    filters: { kingdom: 'Animalia', search: 'bird' },
+  },
+  {
+    title: 'Flora',
+    description: 'Plants and trees from diverse ecosystems',
+    icon: '🌿',
+    count: 10,
+    color: 'from-green-600/20 to-emerald-600/20',
+    filters: { kingdom: 'Plantae' },
+  },
+  {
+    title: 'Marine Life',
+    description: 'Ocean-dwelling creatures and plants',
+    icon: '🐠',
+    count: 30,
+    color: 'from-sky-600/20 to-indigo-600/20',
+    filters: { search: 'marine' },
+  },
+] as const;
 
 // Server Component
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#051F20] to-[#235347]">
+    <div className="min-h-screen bg-gradient-to-b from-[#051F20] to-[#163832]">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-16 lg:py-24">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl lg:text-7xl font-serif text-[#DAF1DE] mb-6">
+      <section className="relative min-h-screen overflow-hidden flex items-center">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#DAF1DE] mb-4 sm:mb-6 leading-tight">
               FloraFauna
-              <span className="block text-3xl lg:text-4xl font-sans text-[#8EB69B] mt-2">
+              <span className="block text-2xl sm:text-3xl md:text-4xl font-sans text-[#8EB69B] mt-1 sm:mt-2">
                 Encyclopedia
               </span>
             </h1>
-            <p className="text-xl lg:text-2xl text-[#DAF1DE]/80 mb-8 leading-relaxed">
+
+            <p className="text-base sm:text-lg md:text-xl text-[#DAF1DE]/80 mb-4 sm:mb-6 leading-relaxed">
               Discover and Learn the Wonders of Biodiversity
             </p>
-            <p className="text-lg text-[#8EB69B] mb-12 max-w-2xl mx-auto">
+
+            <p className="text-sm sm:text-base md:text-lg text-[#8EB69B] mb-8 sm:mb-12 max-w-xl mx-auto px-2">
               Explore our comprehensive collection of flora and fauna species, featuring detailed information,
               stunning photography, and conservation insights from around the world.
             </p>
 
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto mb-12">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8EB69B] h-5 w-5" />
-                <Input
-                  placeholder="Search species by name, taxonomy, or habitat..."
-                  className="pl-12 pr-4 py-4 text-lg bg-[#163832]/50 border-[#8EB69B]/30 text-[#DAF1DE] placeholder-[#8EB69B]/60 focus:border-[#8EB69B] focus:outline-none"
-                />
-              </div>
+            {/* Search Component */}
+            <div className="px-2 sm:px-0">
+              <HeroSearch />
             </div>
 
             {/* Quick Actions */}
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg" className="bg-[#8EB69B] text-[#051F20] hover:bg-[#DAF1DE]">
-                <Link href="#featured-species">
-                  <Leaf className="mr-2 h-5 w-5" />
-                  Explore Species
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-[#8EB69B] text-[#DAF1DE] hover:bg-[#8EB69B]/20">
-                <Link href="#learn">
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Learn & Discover
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-[#8EB69B] text-[#DAF1DE] hover:bg-[#8EB69B]/20">
-                <Link href="#contribute">
-                  <Users className="mr-2 h-5 w-5" />
-                  Contribute
-                </Link>
-              </Button>
+            <div className="mt-6 sm:mt-8 md:mt-10">
+              <HeroActions />
             </div>
           </div>
         </div>
 
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div
             className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%238EB69B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]`}
           ></div>
         </div>
       </section>
 
+
       {/* Featured Species Section */}
-      <section id="featured-species" className="py-16 lg:py-24 bg-[#163832]/20">
+      <section id="featured-species" className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-serif text-[#DAF1DE] mb-4">
@@ -113,40 +130,23 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <CategoryCard
-              title="Mammals"
-              description="Warm-blooded vertebrates with hair or fur"
-              icon="🦁"
-              count="150"
-              color="from-orange-600/20 to-red-600/20"
-            />
-            <CategoryCard
-              title="Birds"
-              description="Feathered vertebrates capable of flight"
-              icon="🦅"
-              count="200"
-              color="from-blue-600/20 to-cyan-600/20"
-            />
-            <CategoryCard
-              title="Flora"
-              description="Plants and trees from diverse ecosystems"
-              icon="🌿"
-              count="300"
-              color="from-green-600/20 to-emerald-600/20"
-            />
-            <CategoryCard
-              title="Marine Life"
-              description="Ocean-dwelling creatures and plants"
-              icon="🐠"
-              count="180"
-              color="from-blue-600/20 to-indigo-600/20"
-            />
+            {CATEGORY_LINKS.map((category) => (
+              <CategoryCard
+                key={category.title}
+                title={category.title}
+                description={category.description}
+                icon={category.icon}
+                count={category.count}
+                color={category.color}
+                href={buildCategoryHref(category.filters)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
       {/* Learn Section */}
-      <section id="learn" className="py-16 lg:py-24 bg-[#163832]/20">
+      <section id="learn" className="py-16 lg:py-24 shadow-2xl bg-[#163832]">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -196,7 +196,7 @@ export default function Home() {
       {/* Contribute Section */}
       <section id="contribute" className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
-          <Card className="bg-[#163832]/50 border-[#8EB69B]/20 max-w-4xl mx-auto">
+          <Card className="bg-[#163832] shadow-2xl border-[#8EB69B]/20  max-w-4xl mx-auto">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl lg:text-4xl font-serif text-[#DAF1DE]">
                 Become a Contributor
@@ -235,16 +235,7 @@ export default function Home() {
               Get weekly updates on new species, conservation news, and educational content.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-[#163832]/50 border-[#8EB69B]/30 text-[#DAF1DE] placeholder-[#8EB69B]/60 focus:border-[#8EB69B] focus:outline-none"
-              />
-              <Button className="bg-[#8EB69B] text-[#051F20] hover:bg-[#DAF1DE]">
-                Subscribe
-              </Button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
       </section>
@@ -253,27 +244,50 @@ export default function Home() {
 }
 
 // Supporting Components
-function CategoryCard({ title, description, icon, count, color }: {
+function CategoryCard({ title, description, icon, count, color, href }: {
   title: string;
   description: string;
   icon: string;
-  count: string;
+  count: number;
   color: string;
+  href: string;
 }) {
   return (
-    <Card className={`group cursor-pointer transition-all duration-300 hover:scale-[1.03] bg-gradient-to-br ${color} border-[#8EB69B]/20 hover:border-[#8EB69B]/40 hover:shadow-lg hover:shadow-[#8EB69B]/10`}>
-      <CardContent className="p-6 text-center">
-        <div className="text-4xl mb-4">{icon}</div>
-        <h3 className="text-xl font-semibold text-[#DAF1DE] mb-2 group-hover:text-[#8EB69B] transition-colors">
-          {title}
-        </h3>
-        <p className="text-sm text-[#8EB69B] mb-3">{description}</p>
-        <Badge variant="secondary" className="bg-[#163832] text-[#DAF1DE]">
-          {count} species
-        </Badge>
-      </CardContent>
-    </Card>
+    <Link
+      href={href}
+      aria-label={`Browse ${title}`}
+      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#8EB69B]"
+    >
+      <Card className={`group cursor-pointer transition-all duration-300 hover:scale-[1.03] bg-gradient-to-br ${color} border-[#8EB69B]/20 hover:border-[#8EB69B]/40 hover:shadow-lg hover:shadow-[#8EB69B]/10`}>
+        <CardContent className="p-6 text-center">
+          <div className="text-4xl mb-4">{icon}</div>
+          <h3 className="text-xl font-semibold text-[#DAF1DE] mb-2 group-hover:text-[#8EB69B] transition-colors">
+            {title}
+          </h3>
+          <p className="text-sm text-[#8EB69B] mb-3">{description}</p>
+          <Badge variant="secondary" className="bg-[#163832] text-[#DAF1DE]">
+            {count.toLocaleString()} species
+          </Badge>
+        </CardContent>
+      </Card>
+    </Link>
   );
+}
+
+function buildCategoryHref(filters: { search?: string; kingdom?: string; iucn_status?: string }) {
+  const params = new URLSearchParams();
+  if (filters.search) {
+    params.set('search', filters.search);
+  }
+  if (filters.kingdom) {
+    params.set('kingdom', filters.kingdom);
+  }
+  if (filters.iucn_status) {
+    params.set('iucn_status', filters.iucn_status);
+  }
+
+  const query = params.toString();
+  return query ? `/species?${query}` : '/species';
 }
 
 function FeatureItem({ icon, title, description }: {

@@ -82,6 +82,10 @@ CREATE TABLE "public"."species_images" (
     CONSTRAINT "species_images_pkey" PRIMARY KEY ("id")
 );
 
+-- Add descriptive field for encyclopedia content
+ALTER TABLE public.species
+ADD COLUMN IF NOT EXISTS info_detail text;
+
 -- Enable Row Level Security
 ALTER TABLE "public"."species" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."taxonomy_hierarchy" ENABLE ROW LEVEL SECURITY;
@@ -230,3 +234,5 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
 GRANT EXECUTE ON FUNCTION "public"."generate_slug" TO authenticated;
 GRANT EXECUTE ON FUNCTION "public"."search_species" TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION "public"."get_featured_species" TO anon, authenticated;
+
+NOTIFY pgrst, 'reload schema';

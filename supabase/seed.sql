@@ -236,3 +236,8 @@ VALUES
 -- Common Sunflower images
 ((SELECT id FROM species WHERE scientific_name = 'Helianthus annuus'), 'https://images.unsplash.com/photo-1547514701-42782101795e?ixlib=rb-4.0.3', 'Field of sunflowers at sunset', 'A golden field of sunflowers basks in the warm sunset light', 'Nature Photographer', 'CC BY-SA 4.0', true, 1),
 ((SELECT id FROM species WHERE scientific_name = 'Helianthus annuus'), 'https://images.unsplash.com/photo-1470092306007-5dc23cc91b25?ixlib=rb-4.0.3', 'Close-up of sunflower face', 'Detailed view of a sunflower''s intricate spiral seed pattern', 'Nature Photographer', 'CC BY-SA 4.0', false, 2);
+
+-- Sample newsletter signup
+INSERT INTO public.newsletter_signups (email, topic, source)
+VALUES ('explorer@example.com', 'species-updates', 'seed-data')
+ON CONFLICT (email) DO NOTHING;

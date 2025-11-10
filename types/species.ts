@@ -11,6 +11,7 @@ export interface Species {
   genus: string | null;
   species: string | null;
   description: string | null;
+  info_detail: string | null;
   morphology: string | null;
   habitat_description: string | null;
   conservation_status: string | null;
