@@ -15,7 +15,7 @@ const supabase = createClient();
  */
 export async function getSpeciesBySlug(slug: string): Promise<SpeciesApiResponse> {
   try {
-    const { data: species, error: speciesError } = await supabase
+    const { data: species, error: speciesError } = await (supabase as any)
       .from('species')
       .select('*')
       .eq('slug', slug)
@@ -31,19 +31,19 @@ export async function getSpeciesBySlug(slug: string): Promise<SpeciesApiResponse
     }
 
     // Fetch related data
-    const { data: taxonomy } = await supabase
+    const { data: taxonomy } = await (supabase as any)
       .from('taxonomy_hierarchy')
       .select('*')
       .eq('species_id', species.id)
       .single();
 
-    const { data: conservation } = await supabase
+    const { data: conservation } = await (supabase as any)
       .from('conservation_data')
       .select('*')
       .eq('species_id', species.id)
       .single();
 
-    const { data: images } = await supabase
+    const { data: images } = await (supabase as any)
       .from('species_images')
       .select('*')
       .eq('species_id', species.id)
@@ -76,7 +76,7 @@ export async function getAllSpecies(
   featured: boolean = false
 ): Promise<SpeciesListApiResponse> {
   try {
-    let query = supabase
+    let query = (supabase as any)
       .from('species')
       .select('*')
       .order('scientific_name', { ascending: true })
@@ -93,7 +93,7 @@ export async function getAllSpecies(
       return { data: null, error: error.message };
     }
 
-    return { data: data || [] };
+    return { data: (data as any[] | null) || [] };
   } catch (error) {
     console.error('Error in getAllSpecies:', error);
     return {
@@ -110,7 +110,7 @@ export async function searchSpecies(
   searchQuery: string
 ): Promise<SearchApiResponse> {
   try {
-    const { data, error } = await supabase.rpc('search_species', {
+    const { data, error } = await (supabase as any).rpc('search_species', {
       search_query: searchQuery
     });
 
@@ -119,7 +119,7 @@ export async function searchSpecies(
       return { data: null, error: error.message };
     }
 
-    return { data: data || [] };
+    return { data: (data as unknown as any[] | null) || [] };
   } catch (error) {
     console.error('Error in searchSpecies:', error);
     return {
@@ -136,7 +136,7 @@ export async function getFeaturedSpecies(
   limit: number = 8
 ): Promise<FeaturedSpeciesApiResponse> {
   try {
-    const { data, error } = await supabase.rpc('get_featured_species', {
+    const { data, error } = await (supabase as any).rpc('get_featured_species', {
       limit_count: limit
     });
 
@@ -145,7 +145,7 @@ export async function getFeaturedSpecies(
       return { data: null, error: error.message };
     }
 
-    return { data: data || [] };
+    return { data: (data as unknown as any[] | null) || [] };
   } catch (error) {
     console.error('Error in getFeaturedSpecies:', error);
     return {
@@ -163,7 +163,7 @@ export async function getSpeciesByKingdom(
   limit: number = 50
 ): Promise<SpeciesListApiResponse> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('species')
       .select('*')
       .eq('kingdom', kingdom)
@@ -193,7 +193,7 @@ export async function getSpeciesByConservationStatus(
   limit: number = 50
 ): Promise<SpeciesListApiResponse> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('species')
       .select('*')
       .eq('iucn_status', status)
@@ -222,7 +222,7 @@ export async function createSpecies(
   species: Omit<Species, 'id' | 'created_at' | 'updated_at'>
 ): Promise<SpeciesApiResponse> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('species')
       .insert(species)
       .select()
@@ -251,7 +251,7 @@ export async function updateSpecies(
   updates: Partial<Species>
 ): Promise<SpeciesApiResponse> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('species')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
@@ -278,7 +278,7 @@ export async function updateSpecies(
  */
 export async function deleteSpecies(id: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('species')
       .delete()
       .eq('id', id);

@@ -1,11 +1,16 @@
 import { Suspense } from 'react';
+<<<<<<< HEAD
 import { Globe, BookOpen, Camera } from 'lucide-react';
+=======
+import { Leaf, Globe, BookOpen, Users, Camera } from 'lucide-react';
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import Image from 'next/image';
 import FeaturedSpeciesClient from '@/components/home/featured-species-client';
+<<<<<<< HEAD
 import HeroSearch from '@/components/home/hero-search';
 import HeroActions from '@/components/home/hero-actions';
 import NewsletterForm from '@/components/home/newsletter-form';
@@ -44,16 +49,26 @@ const CATEGORY_LINKS = [
     filters: { search: 'marine' },
   },
 ] as const;
+=======
+import HomeSearch from '@/components/home/home-search';
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
 
 // Server Component
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#051F20] to-[#163832]">
       {/* Hero Section */}
+<<<<<<< HEAD
       <section className="relative min-h-screen overflow-hidden flex items-center">
         <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#DAF1DE] mb-4 sm:mb-6 leading-tight">
+=======
+      <section className="relative overflow-hidden">
+        <div className="container mx-auto px-4 py-16 lg:py-24">
+          <div className="text-center max-w-4xl mx-auto relative z-10">
+            <h1 className="text-5xl lg:text-7xl font-serif text-[#DAF1DE] mb-6">
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
               FloraFauna
               <span className="block text-2xl sm:text-3xl md:text-4xl font-sans text-[#8EB69B] mt-1 sm:mt-2">
                 Encyclopedia
@@ -69,10 +84,15 @@ export default function Home() {
               stunning photography, and conservation insights from around the world.
             </p>
 
+<<<<<<< HEAD
             {/* Search Component */}
             <div className="px-2 sm:px-0">
               <HeroSearch />
             </div>
+=======
+            {/* Search Bar */}
+            <HomeSearch className="max-w-2xl mx-auto mb-12" />
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
 
             {/* Quick Actions */}
             <div className="mt-6 sm:mt-8 md:mt-10">
@@ -82,9 +102,13 @@ export default function Home() {
         </div>
 
         {/* Background Pattern */}
+<<<<<<< HEAD
         <div className="absolute inset-0 opacity-10 pointer-events-none">
+=======
+        <div className="absolute inset-0 opacity-5 pointer-events-none -z-10" aria-hidden>
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
           <div
-            className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%238EB69B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]`}
+            className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%238EB69B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] pointer-events-none`}
           ></div>
         </div>
       </section>

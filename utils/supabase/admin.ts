@@ -32,7 +32,7 @@ export function createAdminClient() {
         throw new Error('SUPABASE_SERVICE_ROLE_KEY is required to create an admin Supabase client.');
     }
 
-    return createClient<Database>(supabaseUrl, serviceRoleKey);
+    return createClient<Database>(supabaseUrl as string, serviceRoleKey as string);
 }
 
 

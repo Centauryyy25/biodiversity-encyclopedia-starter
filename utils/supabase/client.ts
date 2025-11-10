@@ -17,5 +17,9 @@ const client = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 
 export function createClient() {
+<<<<<<< HEAD
   return client;
+=======
+  return createSupabaseClient<Database>(supabaseUrl as string, supabaseAnonKey as string);
+>>>>>>> dd66b8e7f0ac13e48187d7fedf0f9349ee942198
 }

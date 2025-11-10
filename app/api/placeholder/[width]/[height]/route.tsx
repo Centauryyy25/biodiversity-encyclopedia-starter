@@ -1,22 +1,20 @@
 import { ImageResponse } from 'next/og';
+import type { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
-interface PlaceholderParams {
-  params: {
-    width: string;
-    height: string;
-  };
-}
+// Next.js 16: route handler context params are now a Promise
+type Params = Promise<{ width: string; height: string }>;
 
 const clampDimension = (value: number) => {
   if (!Number.isFinite(value)) return null;
   return Math.min(Math.max(Math.floor(value), 16), 2000);
 };
 
-export async function GET(request: Request, { params }: PlaceholderParams) {
-  const requestedWidth = Number(params.width);
-  const requestedHeight = Number(params.height);
+export async function GET(request: NextRequest, context: { params: Params }) {
+  const { width: widthParam, height: heightParam } = await context.params;
+  const requestedWidth = Number(widthParam);
+  const requestedHeight = Number(heightParam);
 
   const width = clampDimension(requestedWidth);
   const height = clampDimension(requestedHeight);
