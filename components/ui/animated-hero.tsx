@@ -24,14 +24,9 @@ function Hero() {
       <div className="container mx-auto">
         <div className="flex flex-col items-center justify-center gap-8 py-20 lg:py-40">
           <div>
-            <a
-              href="https://codeguide.dev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-row items-center gap-2"
-            >
-              <Image src="/codeguide-logo.png" alt="CodeGuide" width={42} height={42} />
-              <span className="logo-text text-3xl font-bold">CodeGuide</span>
+            <a href="/" className="flex flex-row items-center gap-2">
+              <Image src="/logo-encyclopedia.svg" alt="FloraFauna Encyclopedia" width={42} height={42} />
+              <span className="logo-text text-3xl font-bold">FloraFauna Encyclopedia</span>
             </a>
           </div>
           <div className="flex flex-col gap-4">
