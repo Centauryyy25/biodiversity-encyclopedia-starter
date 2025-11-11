@@ -1,19 +1,13 @@
-import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import SpeciesCatalogClient from '@/components/species/species-catalog-client';
-import type { Species } from '@/types/species';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-
-interface SpeciesListResponse {
-  data: Species[];
-  metadata?: {
-    count: number;
-  };
-  error?: string;
-}
+import { getSpeciesCatalogSnapshot } from '@/lib/supabase/species';
 
 const PAGE_SIZE = 24;
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export const metadata: Metadata = {
   title: 'Species Encyclopedia | FloraFauna',
@@ -21,82 +15,9 @@ export const metadata: Metadata = {
     'Browse the FloraFauna encyclopedia to study detailed species profiles, taxonomy, and conservation data across kingdoms.',
 };
 
-const resolveBaseUrl = async () => {
-  // Prefer explicit env when available
-  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim() !== '') {
-    return process.env.NEXT_PUBLIC_APP_URL;
-  }
-
-  // Vercel provides VERCEL_URL without protocol
-  if (process.env.VERCEL_URL && process.env.VERCEL_URL.trim() !== '') {
-    const hostFromEnv = process.env.VERCEL_URL.replace(/^https?:\/\//, '');
-    return `https://${hostFromEnv}`;
-  }
-
-  // Fallback to request headers when available. Be defensive about shape.
-  try {
-    const headerStore = await headers();
-    const forwardedProto = headerStore.get('x-forwarded-proto') ?? 'http';
-    const forwardedHost = headerStore.get('x-forwarded-host');
-    const host = forwardedHost ?? headerStore.get('host');
-
-    if (host) {
-      return `${forwardedProto}://${host}`;
-    }
-  } catch {
-    // Ignore and fall through to localhost
-  }
-
-  // Final local fallback
-  return 'http://localhost:3000';
-};
-
-interface SpeciesFilters {
-  search?: string;
-  kingdom?: string;
-  status?: string;
-}
-
 type SpeciesPageProps = {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
-
-async function fetchInitialSpecies(filters: SpeciesFilters): Promise<SpeciesListResponse> {
-  const baseUrl = await resolveBaseUrl();
-
-  try {
-    const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
-
-    if (filters.search) {
-      params.set('search', filters.search);
-    }
-
-    if (filters.kingdom) {
-      params.set('kingdom', filters.kingdom);
-    }
-
-    if (filters.status) {
-      params.set('iucn_status', filters.status);
-    }
-
-    const response = await fetch(`${baseUrl}/api/species?${params.toString()}`, {
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      const message = await response.text();
-      throw new Error(message || 'Failed to fetch species catalog');
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Failed to load species catalog:', error);
-    return {
-      data: [],
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
-}
 
 export default async function SpeciesPage({ searchParams }: SpeciesPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
@@ -109,13 +30,18 @@ export default async function SpeciesPage({ searchParams }: SpeciesPageProps) {
       ? resolvedSearchParams.iucn_status
       : undefined;
 
-  const initialPayload = await fetchInitialSpecies({
+  const initialPayload = await getSpeciesCatalogSnapshot({
     search,
     kingdom,
-    status,
+    iucnStatus: status,
+    limit: PAGE_SIZE,
   });
-  const initialSpecies = initialPayload.data ?? [];
-  const initialCount = initialPayload.metadata?.count ?? initialSpecies.length;
+  const initialSpecies = initialPayload.data;
+  const initialCount = initialPayload.count;
+
+  if (initialPayload.error) {
+    console.warn('[SpeciesPage Warning]', initialPayload.error);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#051F20] to-[#235347] py-16">
@@ -137,7 +63,8 @@ export default async function SpeciesPage({ searchParams }: SpeciesPageProps) {
           <Alert className="bg-[#401414]/60 border border-[#F87171]/40 text-[#FECACA]">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Unable to load the latest catalog data. Showing cached results where available.
+              Unable to load the latest catalog data. {initialPayload.error}. Showing cached results
+              where available.
             </AlertDescription>
           </Alert>
         )}

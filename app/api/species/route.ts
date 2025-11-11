@@ -15,6 +15,10 @@ type SpeciesInsert = TablesInsert<'species'>;
 type SearchFunctionRow =
   Database['public']['Functions']['search_species']['Returns'][number];
 
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Math.max(Number(searchParams.get('limit')) || 24, 1), 100);
@@ -133,6 +137,12 @@ export async function GET(request: NextRequest) {
 
   const normalized = (data ?? []).map((record) =>
     normalizeSpeciesRecord(record as Species)
+  );
+
+  console.info(
+    `[Species API] Responding with ${normalized.length} records (limit=${limit}, offset=${offset}, mode=${
+      search ? 'search' : 'basic'
+    }) at ${new Date().toISOString()}`
   );
 
   return NextResponse.json({

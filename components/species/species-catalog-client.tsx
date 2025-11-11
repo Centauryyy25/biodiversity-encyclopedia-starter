@@ -121,12 +121,20 @@ export default function SpeciesCatalogClient({
         setTotalCount(payload.metadata?.count ?? payload.data?.length ?? 0);
 
         if (payload.error) {
+          console.warn('[SpeciesCatalogClient Warning]', payload.error);
           setError(typeof payload.error === 'string' ? payload.error : 'Unknown error');
+        } else {
+          console.info(
+            `[SpeciesCatalogClient] Loaded ${
+              payload.data?.length ?? 0
+            } species at ${new Date().toISOString()}`
+          );
         }
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') {
           return;
         }
+        console.error('[SpeciesCatalogClient Fetch Error]', err);
         setError(err instanceof Error ? err.message : 'Failed to load species catalog');
       } finally {
         setLoading(false);
@@ -223,7 +231,9 @@ export default function SpeciesCatalogClient({
       {error && (
         <Alert className="bg-[#401414]/60 border border-[#F87171]/40 text-[#FECACA]">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            ⚠️ Unable to load the latest catalog data. {error}. Showing cached results if available.
+          </AlertDescription>
         </Alert>
       )}
 

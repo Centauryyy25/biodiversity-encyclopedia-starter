@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/client';
+import { sanitizeSearchTerm } from '@/lib/api/species-route-helpers';
 import type {
   Species,
   SpeciesWithDetails,
@@ -27,6 +28,21 @@ type FeaturedFunctionRow =
   Database['public']['Functions']['get_featured_species']['Returns'][number];
 type SearchFunctionRow =
   Database['public']['Functions']['search_species']['Returns'][number];
+
+export interface SpeciesCatalogFilters {
+  limit?: number;
+  offset?: number;
+  featured?: boolean;
+  kingdom?: string | null;
+  iucnStatus?: string | null;
+  search?: string | null;
+}
+
+export interface SpeciesCatalogResult {
+  data: Species[];
+  count: number;
+  error: string | null;
+}
 
 const mapSpeciesRow = (row: SpeciesRow): Species => ({
   ...row,
@@ -152,6 +168,90 @@ export async function getAllSpecies(
     return {
       data: null,
       error: error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
+/**
+ * Fetch the catalog snapshot with robust logging to keep RSC data fresh.
+ */
+export async function getSpeciesCatalogSnapshot(
+  filters: SpeciesCatalogFilters = {}
+): Promise<SpeciesCatalogResult> {
+  const {
+    limit = 24,
+    offset = 0,
+    featured = false,
+    kingdom,
+    iucnStatus,
+    search,
+  } = filters;
+
+  try {
+    let query = supabase
+      .from('species')
+      .select('*', { count: 'exact' })
+      .order('featured', { ascending: false })
+      .order('scientific_name', { ascending: true })
+      .range(offset, offset + limit - 1);
+
+    if (featured) {
+      query = query.eq('featured', true);
+    }
+
+    if (kingdom && kingdom !== 'all') {
+      query = query.ilike('kingdom', kingdom);
+    }
+
+    if (iucnStatus && iucnStatus !== 'all') {
+      query = query.eq('iucn_status', iucnStatus);
+    }
+
+    if (search) {
+      const term = sanitizeSearchTerm(search);
+      if (term) {
+        query = query.or(
+          `scientific_name.ilike.%${term}%,common_name.ilike.%${term}%`
+        );
+      }
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error('[Supabase Fetch Error]', error.message);
+      return {
+        data: [],
+        count: 0,
+        error: `Failed to fetch species list: ${error.message}`,
+      };
+    }
+
+    const mapped = (data ?? []).map((row) => mapSpeciesRow(row as SpeciesRow));
+    console.info(
+      `[Supabase Fetch Success] Loaded ${
+        mapped.length
+      } species at ${new Date().toISOString()} (filters=${JSON.stringify({
+        limit,
+        offset,
+        featured,
+        kingdom,
+        iucnStatus,
+        hasSearch: Boolean(search),
+      })})`
+    );
+
+    return {
+      data: mapped,
+      count: count ?? mapped.length,
+      error: null,
+    };
+  } catch (error) {
+    console.error('[Unexpected Fetch Error]', error);
+    return {
+      data: [],
+      count: 0,
+      error: 'Unexpected error while fetching species data',
     };
   }
 }
