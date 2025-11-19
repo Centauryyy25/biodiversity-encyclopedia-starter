@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Globe, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthGatedButton from '@/components/auth/AuthGatedButton';
@@ -11,6 +11,7 @@ import HeroSearch from '@/components/home/hero-search';
 import HeroActions from '@/components/home/hero-actions';
 import NewsletterForm from '@/components/home/newsletter-form';
 import encyclopediaImage from '@/public/Encyclopedia.png';
+import { getFeaturedSpecies } from '@/lib/data/featured-species';
 const CATEGORY_LINKS = [
   {
     title: 'Mammals',
@@ -47,7 +48,8 @@ const CATEGORY_LINKS = [
 ] as const;
 
 // Server Component
-export default function Home() {
+export default async function Home() {
+  const featuredSpecies = await getFeaturedSpecies(8);
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#051F20] to-[#163832]">
       {/* Hero Section */}
@@ -104,9 +106,7 @@ export default function Home() {
             </p>
           </div>
 
-          <Suspense fallback={<FeaturedSpeciesLoading />}>
-            <FeaturedSpeciesClient />
-          </Suspense>
+          <FeaturedSpeciesClient species={featuredSpecies} />
 
           <div className="text-center mt-12">
             <Button asChild variant="outline" size="lg" className="border-[#8EB69B] text-[#DAF1DE] hover:bg-[#8EB69B]/20">
@@ -119,18 +119,27 @@ export default function Home() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-serif text-[#DAF1DE] mb-4">
+      <section className="relative mb-52 py-16 lg:py-24">
+        {/* subtle gradient background for the whole section */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_#22c55e1a,_transparent_55%),radial-gradient(circle_at_bottom,_#0ea5e91a,_transparent_55%)]" />
+
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="mb-12 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/5 px-4 py-1 text-xs font-medium uppercase tracking-[0.2em] text-emerald-300/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Categories
+            </div>
+
+            <h2 className="mt-5 text-3xl lg:text-4xl font-serif text-[#E4FFE9] tracking-tight">
               Explore Categories
             </h2>
-            <p className="text-lg text-[#8EB69B] max-w-2xl mx-auto">
-              Navigate through the diversity of life using our organized categories.
+
+            <p className="mt-3 text-base lg:text-lg text-[#9CCFB0] max-w-2xl mx-auto">
+              Navigate through the diversity of life using our curated, easy-to-explore categories.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {CATEGORY_LINKS.map((category) => (
               <CategoryCard
                 key={category.title}
@@ -202,9 +211,52 @@ export default function Home() {
       </section>
 
       {/* Contribute Section */}
-      <section id="contribute" className="py-16 mt-32 lg:py-24">
-        <div className="container mx-auto px-4">
-          <Card className="bg-[#163832] shadow-2xl border-[#8EB69B]/20  max-w-4xl mx-auto">
+      <section
+        id="contribute"
+        className="relative overflow-hidden py-0 h-screen mt-0 lg:py-24 flex items-center justify-center"
+      >
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <Image
+            src="/1.svg"
+            alt=""
+            width={640}
+            height={640}
+            className="absolute stroke-black w-56 md:w-[40rem] mt-0 opacity-[0.24] top-0 left-6 md:left-0 rotate-6 "
+            priority
+          />
+          {/* <img
+            src="/2.svg"
+            alt=""
+            className="absolute w-16 md:w-96 opacity-[0.23] top-24 right-10 md:right-16 -rotate-3 drop-shadow-[5px_7px_7px_rgba(0,0,0,0.2)] brightness-[1.15] saturate-[1.1]"
+          /> */}
+          <Image
+            src="/3.svg"
+            alt=""
+            width={480}
+            height={480}
+            className="absolute w-20 md:w-72 opacity-25 bottom-0 left-10 md:left-20 rotate-9 drop-shadow-[7px_9px_9px_rgba(0,0,0,0.22)] brightness-[1.12] saturate-[1.08]"
+            priority
+          />
+          <Image
+            src="/4.svg"
+            alt=""
+            width={320}
+            height={320}
+            className="absolute w-16 md:w-48 opacity-[0.2] bottom-0 left-1/2 -translate-x-1/2 -rotate-12 drop-shadow-[6px_8px_8px_rgba(0,0,0,0.2)] brightness-[1.12] saturate-[1.08]"
+            priority
+          />
+          <Image
+            src="/5.svg"
+            alt=""
+            width={320}
+            height={320}
+            className="absolute w-[4.5rem] md:w-[20rem] opacity-[0.22] bottom-40 right-6 md:right-16 rotate-3 drop-shadow-[6px_9px_9px_rgba(0,0,0,0.24)] brightness-[1.15] saturate-[1.1]"
+            priority
+          />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <Card className="bg-[#163832] shadow-2xl border-[#8EB69B]/20 max-w-4xl mx-auto">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl lg:text-4xl font-serif text-[#DAF1DE]">
                 Become a Contributor
@@ -213,6 +265,7 @@ export default function Home() {
                 Share your knowledge and help build the most comprehensive biodiversity encyclopedia.
               </p>
             </CardHeader>
+
             <CardContent className="text-center space-y-6">
               <p className="text-[#DAF1DE]">
                 Join our community of scientists, photographers, and nature enthusiasts
@@ -225,7 +278,11 @@ export default function Home() {
                   label="Join as Contributor"
                   className="bg-[#8EB69B] text-[#051F20] hover:bg-[#DAF1DE]"
                 />
-                <Button asChild variant="outline" className="border-[#8EB69B] text-[#DAF1DE] hover:bg-[#8EB69B]/20">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-[#8EB69B] text-[#DAF1DE] hover:bg-[#8EB69B]/20"
+                >
                   <Link href="/contributors">View Contributors</Link>
                 </Button>
               </div>
@@ -234,9 +291,50 @@ export default function Home() {
         </div>
       </section>
 
+
       {/* Newsletter Section */}
-      <section className="py-16 lg:py-24 bg-[#163832]/20">
-        <div className="container mx-auto px-4">
+      <section
+        id="newsletter"
+        className="relative overflow-hidden py-16 lg:py-24 bg-[#163832]/20"
+      >
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <Image
+            src="/5.svg"
+            alt=""
+            width={320}
+            height={320}
+            className="absolute w-16 md:w-24 opacity-[0.23] top-2/3 left-8 md:left-16 rotate-3 drop-shadow-[6px_8px_8px_rgba(0,0,0,0.22)] brightness-[1.15] saturate-[1.1]"
+            priority
+          />
+          <Image
+            src="/2.svg"
+            alt=""
+            width={480}
+            height={480}
+            className="absolute w-16 md:w-[15rem] opacity-25 top-1/2 left-1/4 -translate-y-1/2 -rotate-4 drop-shadow-[6px_8px_8px_rgba(0,0,0,0.2)] brightness-[1.12] saturate-[1.08]"
+            priority
+          />
+          {/* <img
+            src="/1.svg"
+            alt=""
+            className="absolute w-20 md:w-28 opacity-[0.22] bottom-10 right-6 md:right-16 rotate-8 drop-shadow-[7px_9px_9px_rgba(0,0,0,0.24)] brightness-[1.15] saturate-[1.1]"
+          /> */}
+          <Image
+            src="/3.svg"
+            alt=""
+            width={420}
+            height={420}
+            className="absolute w-16 md:w-52 opacity-[0.2] top-0 right-14 md:left-[86rem] -rotate-10 drop-shadow-[5px_7px_7px_rgba(0,0,0,0.18)] brightness-[1.12] saturate-[1.08]"
+            priority
+          />
+          {/* <img
+            src="/4.svg"
+            alt=""
+            className="absolute w-16 md:w-24 opacity-[0.22] bottom-24 left-8 md:left-20 rotate-2 drop-shadow-[6px_8px_8px_rgba(0,0,0,0.2)] brightness-[1.15] saturate-[1.1]"
+          /> */}
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="text-3xl lg:text-4xl font-serif text-[#DAF1DE] mb-4">
               Stay Connected
@@ -318,21 +416,3 @@ function FeatureItem({ icon, title, description }: {
   );
 }
 
-function FeaturedSpeciesLoading() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-        <div key={i} className="animate-pulse">
-          <div className="bg-[#163832]/50 border-[#8EB69B]/20 rounded-lg overflow-hidden">
-            <div className="aspect-video bg-[#0B2B26]/50"></div>
-            <div className="p-4 space-y-3">
-              <div className="h-6 bg-[#0B2B26]/50 rounded"></div>
-              <div className="h-4 bg-[#0B2B26]/50 rounded w-3/4"></div>
-              <div className="h-4 bg-[#0B2B26]/50 rounded w-1/2"></div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}

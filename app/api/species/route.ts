@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { supabaseAdmin, hasSupabaseServiceRole } from '@/utils/supabase/admin';
+import { supabaseLean, hasServiceRole } from '@/utils/supabase/lean-admin';
 import {
   normalizeSpeciesRecord,
   sanitizeSearchTerm,
@@ -15,13 +15,12 @@ type SpeciesInsert = TablesInsert<'species'>;
 type SearchFunctionRow =
   Database['public']['Functions']['search_species']['Returns'][number];
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+export const runtime = 'edge';
+export const revalidate = 300;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const limit = Math.min(Math.max(Number(searchParams.get('limit')) || 24, 1), 100);
+  const limit = Math.min(Math.max(Number(searchParams.get('limit')) || 12, 1), 100);
   const offset = Math.max(Number(searchParams.get('offset')) || 0, 0);
   const featured = searchParams.get('featured') === 'true';
   const kingdom = searchParams.get('kingdom');
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
       const term = sanitizeSearchTerm(search);
       if (term) {
         // 1) Call RPC to get ranked hits (id, rank, etc.)
-        const { data: hits, error: rpcError } = await supabaseAdmin.rpc(
+        const { data: hits, error: rpcError } = await supabaseLean.rpc(
           'search_species',
           { search_query: term }
         );
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
           // 2) If there are extra filters, compute the allowed ids via a cheap filtered select.
           let filteredIds = orderedIds;
           if (filteredIds.length > 0 && (kingdom || iucnStatus || featured)) {
-            let idFilterQuery = supabaseAdmin
+            let idFilterQuery = supabaseLean
               .from('species')
               .select('id')
               .in('id', orderedIds);
@@ -65,7 +64,7 @@ export async function GET(request: NextRequest) {
           const pagedIds = filteredIds.slice(offset, offset + limit);
 
           // 3) Fetch full records for paged ids and order them to match rank order
-          let detailsQuery = supabaseAdmin.from('species').select('*');
+          let detailsQuery = supabaseLean.from('species').select('*');
           if (pagedIds.length > 0) {
             detailsQuery = detailsQuery.in('id', pagedIds);
           } else {
@@ -102,7 +101,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Fallback/basic query path (no search term or RPC unavailable)
-  let query = supabaseAdmin
+  let query = supabaseLean
     .from('species')
     .select('*', { count: 'exact' })
     .order('featured', { ascending: false })
@@ -169,7 +168,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  if (!hasSupabaseServiceRole) {
+  if (!hasServiceRole) {
     return NextResponse.json(
       {
         error:
@@ -192,7 +191,7 @@ export async function POST(request: NextRequest) {
 
   const speciesInsert: SpeciesInsert = { ...payload, slug };
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseLean
     .from('species')
     .insert([speciesInsert])
     .select('*')

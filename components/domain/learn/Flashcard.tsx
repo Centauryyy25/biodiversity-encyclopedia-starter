@@ -14,12 +14,12 @@ export default function Flashcard({ front, back }: { front: string; back: string
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
       >
-        <Card className="absolute inset-0 backface-hidden flex items-center justify-center rounded-2xl">
+        <Card className="absolute inset-0 border border-white/10 shadow-xl bg-[#112925]/50 backface-hidden flex items-center justify-center rounded-2xl">
           <CardContent className="text-center text-[#2F5233] dark:text-[#DAF1DE] flex items-center justify-center">
             <span className="text-lg font-serif">{front}</span>
           </CardContent>
         </Card>
-        <Card className="absolute inset-0 [transform:rotateY(180deg)] backface-hidden flex items-center justify-center rounded-2xl">
+        <Card className="absolute inset-0 border border-white/10 shadow-xl bg-[#112925]/50 [transform:rotateY(180deg)] backface-hidden flex items-center justify-center rounded-2xl">
           <CardContent className="text-center text-[#2F5233] dark:text-[#DAF1DE] flex items-center justify-center">
             <span className="text-lg">{back}</span>
           </CardContent>
@@ -28,4 +28,3 @@ export default function Flashcard({ front, back }: { front: string; back: string
     </motion.div>
   )
 }
-

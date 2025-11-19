@@ -1,60 +1,97 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import SpeciesCatalogClient from '@/components/species/species-catalog-client';
 import { FadeIn } from '@/components/ui/fade-in';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { getSpeciesCatalogSnapshot } from '@/lib/supabase/species';
 
-const PAGE_SIZE = 24;
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+const PAGE_SIZE = 12;
+export const revalidate = 120;
 
-export const metadata: Metadata = {
-  title: 'Species Encyclopedia | FloraFauna',
-  description:
-    'Browse the FloraFauna encyclopedia to study detailed species profiles, taxonomy, and conservation data across kingdoms.',
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+const coerceParam = (value: string | string[] | undefined) => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
 };
 
+const buildUrlWithPage = (page: number, params: SearchParams) => {
+  const query = new URLSearchParams();
+  const search = coerceParam(params.search);
+  const kingdom = coerceParam(params.kingdom);
+  const status = coerceParam(params.iucn_status);
+
+  if (search) query.set('search', search);
+  if (kingdom) query.set('kingdom', kingdom);
+  if (status) query.set('iucn_status', status);
+  query.set('page', String(page));
+
+  const qs = query.toString();
+  return qs ? `/species?${qs}` : '/species';
+};
+
+const resolveSearchParams = async (params?: Promise<SearchParams>) =>
+  (params ? (await params) ?? {} : {}) as SearchParams;
+
+export async function generateMetadata(
+  { searchParams }: { searchParams?: Promise<SearchParams> }
+): Promise<Metadata> {
+  const resolvedParams = await resolveSearchParams(searchParams);
+  const pageParam = coerceParam(resolvedParams.page);
+  const page = Number.parseInt(pageParam ?? '1', 10);
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+
+  const title =
+    safePage > 1
+      ? `Species Encyclopedia - Page ${safePage} | FloraFauna`
+      : 'Species Encyclopedia | FloraFauna';
+
+  const canonical = buildUrlWithPage(safePage, resolvedParams);
+
+  return {
+    title,
+    description:
+      'Browse the FloraFauna encyclopedia to study detailed species profiles, taxonomy, and conservation data across kingdoms.',
+    alternates: {
+      canonical,
+    },
+  };
+}
+
 export default async function SpeciesPage(
-  { searchParams }: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  }
+  { searchParams }: { searchParams?: Promise<SearchParams> }
 ) {
-  const sp = await searchParams;
-  const rawSearch = (sp as Record<string, unknown>).search;
-  const rawKingdom = (sp as Record<string, unknown>).kingdom;
-  const rawStatus = (sp as Record<string, unknown>).iucn_status;
+  const resolvedParams = await resolveSearchParams(searchParams);
+  const search = coerceParam(resolvedParams.search);
+  const kingdom = coerceParam(resolvedParams.kingdom);
+  const status = coerceParam(resolvedParams.iucn_status);
 
-  const search =
-    typeof rawSearch === 'string'
-      ? rawSearch
-      : Array.isArray(rawSearch) && typeof rawSearch[0] === 'string'
-      ? rawSearch[0]
-      : undefined;
+  const pageParam = coerceParam(resolvedParams.page);
+  const parsedPage = Number.parseInt(pageParam ?? '1', 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const kingdom =
-    typeof rawKingdom === 'string'
-      ? rawKingdom
-      : Array.isArray(rawKingdom) && typeof rawKingdom[0] === 'string'
-      ? rawKingdom[0]
-      : undefined;
+  if (!Number.isFinite(parsedPage) || parsedPage < 1) {
+    redirect(buildUrlWithPage(1, resolvedParams));
+  }
 
-  const status =
-    typeof rawStatus === 'string'
-      ? rawStatus
-      : Array.isArray(rawStatus) && typeof rawStatus[0] === 'string'
-      ? rawStatus[0]
-      : undefined;
+  const offset = (page - 1) * PAGE_SIZE;
 
   const initialPayload = await getSpeciesCatalogSnapshot({
     search,
     kingdom,
     iucnStatus: status,
     limit: PAGE_SIZE,
+    offset,
   });
   const initialSpecies = initialPayload.data;
   const initialCount = initialPayload.count;
+  const totalPages = Math.max(1, Math.ceil((initialCount ?? 0) / PAGE_SIZE));
+
+  if (page > totalPages && totalPages > 0) {
+    redirect(buildUrlWithPage(1, resolvedParams));
+  }
 
   if (initialPayload.error) {
     console.warn('[SpeciesPage Warning]', initialPayload.error);
@@ -87,14 +124,16 @@ export default async function SpeciesPage(
         )}
 
         <FadeIn>
-        <SpeciesCatalogClient
-          initialSpecies={initialSpecies}
-          initialCount={initialCount}
-          pageSize={PAGE_SIZE}
-          initialSearch={search ?? ''}
-          initialKingdom={kingdom ?? 'all'}
-          initialStatus={status ?? 'all'}
-        />
+          <SpeciesCatalogClient
+            initialSpecies={initialSpecies}
+            initialCount={initialCount}
+            currentPage={page}
+            pageSize={PAGE_SIZE}
+            initialSearch={search ?? ''}
+            initialKingdom={kingdom ?? 'all'}
+            initialStatus={status ?? 'all'}
+            disableInitialFetch
+          />
         </FadeIn>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { supabaseAdmin, hasSupabaseServiceRole } from '@/utils/supabase/admin';
+import { supabaseLean, hasServiceRole } from '@/utils/supabase/lean-admin';
 import {
   normalizeSpeciesRecord,
   slugify,
@@ -26,17 +26,17 @@ const resolveIdentifierColumn = (identifier: string) =>
 
 const enrichSpeciesRecord = async (speciesId: string) => {
   const [{ data: taxonomy }, { data: conservation }, { data: images }] = await Promise.all([
-    supabaseAdmin
+    supabaseLean
       .from('taxonomy_hierarchy')
       .select('*')
       .eq('species_id', speciesId)
       .maybeSingle(),
-    supabaseAdmin
+    supabaseLean
       .from('conservation_data')
       .select('*')
       .eq('species_id', speciesId)
       .maybeSingle(),
-    supabaseAdmin
+    supabaseLean
       .from('species_images')
       .select('*')
       .eq('species_id', speciesId)
@@ -54,7 +54,7 @@ export async function GET(_request: NextRequest, context: { params: Params }) {
   const { identifier } = await context.params;
   const column = resolveIdentifierColumn(identifier);
 
-  const { data: species, error } = await supabaseAdmin
+  const { data: species, error } = await supabaseLean
     .from('species')
     .select('*')
     .eq(column, identifier)
@@ -82,7 +82,7 @@ export async function PUT(request: NextRequest, context: { params: Params }) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  if (!hasSupabaseServiceRole) {
+  if (!hasServiceRole) {
     return NextResponse.json(
       {
         error:
@@ -117,7 +117,7 @@ export async function PUT(request: NextRequest, context: { params: Params }) {
     updated_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseLean
     .from('species')
     .update(speciesUpdate)
     .eq(column, identifier)

@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Past runs used custom distDir outside project which broke module resolution in dev.
+  // Keep dist inside repo; allow override via NEXT_DIST_DIR if needed, default .next.
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'upload.wikimedia.org' },

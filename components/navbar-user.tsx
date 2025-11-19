@@ -1,9 +1,13 @@
 "use client"
 
 import Link from 'next/link'
-import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
+import { UserButton, SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs'
 
 export default function NavbarUser() {
+  const { user } = useUser()
+  const role = (user?.publicMetadata?.role as string | undefined) ?? ''
+  const isAdmin = role === 'admin' || role === 'moderator'
+
   return (
     <nav
       className="fixed top-0 left-0 right-0 z-50
@@ -56,6 +60,18 @@ export default function NavbarUser() {
           >
             Dashboard
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/moderate"
+              className="hidden sm:inline px-4 py-1.5 rounded-md
+              border border-emerald-500/50
+              bg-emerald-500/15 hover:bg-emerald-500/25
+              text-emerald-50 transition-all duration-200
+              backdrop-blur-sm shadow-[0_6px_16px_rgba(0,0,0,0.15)]"
+            >
+              Moderator Center
+            </Link>
+          )}
           <UserButton afterSignOutUrl="/" />
         </SignedIn>
 

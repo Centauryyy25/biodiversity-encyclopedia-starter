@@ -30,7 +30,7 @@ export default function MyResults() {
 
   if (isLoading) {
     return (
-      <Card className="rounded-2xl">
+      <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
         <CardContent className="p-6 space-y-3">
           <div className="animate-pulse h-6 w-1/3 rounded bg-muted" />
           <div className="animate-pulse h-6 w-2/3 rounded bg-muted" />
@@ -51,7 +51,7 @@ export default function MyResults() {
 
   if (!data || data.length === 0) {
     return (
-      <Card className="rounded-2xl">
+      <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
         <CardHeader>
           <CardTitle className="text-[#2F5233] dark:text-[#DAF1DE]">My Results</CardTitle>
         </CardHeader>
@@ -63,11 +63,11 @@ export default function MyResults() {
   }
 
   return (
-    <Card className="rounded-2xl">
+    <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
       <CardHeader>
         <CardTitle className="text-[#2F5233] dark:text-[#DAF1DE]">My Results</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 border-white/10 shadow-xl bg-[#112925]/50">
         {data.map((row) => (
           <div key={row.id} className="flex items-center justify-between border rounded-xl px-4 py-3">
             <div className="space-y-0.5">
@@ -81,4 +81,3 @@ export default function MyResults() {
     </Card>
   )
 }
-

@@ -22,13 +22,13 @@ export default function QuizFilterBar({
   setQuery: (q: string) => void
 }) {
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col  gap-3 md:flex-row md:items-center md:justify-between">
       <div className="flex gap-3">
         <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
-          <SelectTrigger aria-label="Filter by difficulty" className="w-40 rounded-2xl">
+          <SelectTrigger aria-label="Filter by difficulty" className="w-40 border-white/10 shadow-xl bg-[#112925]/50 rounded-2xl">
             <SelectValue placeholder="Difficulty" />
           </SelectTrigger>
-          <SelectContent className="rounded-xl">
+          <SelectContent className="rounded-xl border-white/10 shadow-xl bg-[#112925]/50">
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="Beginner">Beginner</SelectItem>
             <SelectItem value="Intermediate">Intermediate</SelectItem>
@@ -37,10 +37,10 @@ export default function QuizFilterBar({
         </Select>
 
         <Select value={topic} onValueChange={(v) => setTopic(v as TopicOption)}>
-          <SelectTrigger aria-label="Filter by topic" className="w-44 rounded-2xl">
+          <SelectTrigger aria-label="Filter by topic" className="w-44 border-white/10 shadow-xl bg-[#112925]/50 rounded-2xl">
             <SelectValue placeholder="Topic" />
           </SelectTrigger>
-          <SelectContent className="rounded-xl">
+          <SelectContent className="rounded-xl border-white/10 shadow-xl bg-[#112925]/50">
             <SelectItem value="all">All Topics</SelectItem>
             <SelectItem value="Taxonomy">Taxonomy</SelectItem>
             <SelectItem value="Habitats">Habitats & Biomes</SelectItem>
@@ -52,7 +52,7 @@ export default function QuizFilterBar({
       </div>
 
       <div className="md:w-72">
-        <label htmlFor="quiz-search" className="sr-only">Search quizzes</label>
+        <label htmlFor="quiz-search" className="sr-only border-white/10 shadow-xl bg-[#112925]/50">Search quizzes</label>
         <Input
           id="quiz-search"
           value={query}

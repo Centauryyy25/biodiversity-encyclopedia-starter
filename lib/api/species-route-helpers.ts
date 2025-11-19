@@ -18,6 +18,7 @@ export const speciesPayloadSchema = z.object({
   genus: z.string().min(2).max(120).optional().nullable(),
   species: z.string().min(1).max(120).optional().nullable(),
   description: z.string().min(10).optional().nullable(),
+  info_detail: z.string().optional().nullable(),
   morphology: z.string().optional().nullable(),
   habitat_description: z.string().optional().nullable(),
   conservation_status: z.string().optional().nullable(),

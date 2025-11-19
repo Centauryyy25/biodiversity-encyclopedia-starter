@@ -22,9 +22,32 @@ export default function ActionButtons({ id, onChange }: { id: string; onChange?:
 
   return (
     <div className="inline-flex gap-2">
-      <Button size="sm" variant="secondary" aria-label="Approve" onClick={() => update('approved')}>Approve</Button>
-      <Button size="sm" variant="outline" aria-label="Reject" onClick={() => update('rejected')}>Reject</Button>
-      <Button size="sm" variant="destructive" aria-label="Flag" onClick={() => update('flagged')}>Flag</Button>
+      <Button
+        size="sm"
+        className="bg-emerald-500 text-[#051F20] hover:bg-emerald-400 shadow-[0_6px_16px_rgba(16,185,129,0.35)]"
+        aria-label="Approve"
+        onClick={() => update('approved')}
+      >
+        Approve
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="border-amber-400/70 text-amber-100 hover:bg-amber-500/15"
+        aria-label="Reject"
+        onClick={() => update('rejected')}
+      >
+        Reject
+      </Button>
+      <Button
+        size="sm"
+        variant="destructive"
+        className="bg-red-500 text-white hover:bg-red-400"
+        aria-label="Flag"
+        onClick={() => update('flagged')}
+      >
+        Flag
+      </Button>
     </div>
   )
 }

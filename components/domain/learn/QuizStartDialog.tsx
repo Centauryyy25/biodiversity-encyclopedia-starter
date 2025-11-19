@@ -19,7 +19,7 @@ export default function QuizStartDialog({ quiz, trigger }: { quiz: QuizMeta; tri
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="rounded-2xl">
+      <DialogContent className="rounded-2xl border-white/10 shadow-xl bg-[#112925]/80">
         <DialogHeader>
           <DialogTitle>{quiz.title}</DialogTitle>
           <DialogDescription>

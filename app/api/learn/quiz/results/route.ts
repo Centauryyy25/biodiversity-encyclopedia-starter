@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { auth } from '@clerk/nextjs/server'
-import { supabaseAdmin, hasSupabaseServiceRole } from '@/utils/supabase/admin'
+import { supabaseLean, hasServiceRole } from '@/utils/supabase/lean-admin'
 import { isMissingTableError } from '@/utils/supabase/errors'
 import type { Database, Json } from '@/types/database.types'
 
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!hasSupabaseServiceRole) {
+    if (!hasServiceRole) {
       return NextResponse.json({ error: 'Server missing SUPABASE_SERVICE_ROLE_KEY for writes' }, { status: 500 })
     }
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       metadata: (parsed.metadata as Json | undefined) ?? null,
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabaseLean
       .from('quiz_results')
       .insert([payload])
 
@@ -64,11 +64,11 @@ export async function GET() {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     // If service role key isn't available (local dev or misconfig), degrade gracefully
-    if (!hasSupabaseServiceRole) {
+    if (!hasServiceRole) {
       return NextResponse.json({ data: [] })
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseLean
       .from('quiz_results')
       .select('*')
       .eq('user_id', userId)

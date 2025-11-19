@@ -248,32 +248,56 @@ export type Database = {
             }
             submissions: {
                 Row: {
+                    contributor_email: string | null
+                    contributor_name: string | null
                     content: string | null
                     created_at: string
                     id: string
+                    moderator_notes: string | null
+                    payload: Json
+                    published: boolean
+                    published_at: string | null
+                    published_species_id: string | null
                     status: "pending" | "approved" | "rejected" | "flagged"
                     title: string
                     type: "image" | "text"
+                    updated_at: string
                     url: string | null
                     user_id: string
                 }
                 Insert: {
+                    contributor_email?: string | null
+                    contributor_name?: string | null
                     content?: string | null
                     created_at?: string
                     id?: string
+                    moderator_notes?: string | null
+                    payload: Json
+                    published?: boolean
+                    published_at?: string | null
+                    published_species_id?: string | null
                     status?: "pending" | "approved" | "rejected" | "flagged"
                     title: string
                     type?: "image" | "text"
+                    updated_at?: string
                     url?: string | null
                     user_id: string
                 }
                 Update: {
+                    contributor_email?: string | null
+                    contributor_name?: string | null
                     content?: string | null
                     created_at?: string
                     id?: string
+                    moderator_notes?: string | null
+                    payload?: Json
+                    published?: boolean
+                    published_at?: string | null
+                    published_species_id?: string | null
                     status?: "pending" | "approved" | "rejected" | "flagged"
                     title?: string
                     type?: "image" | "text"
+                    updated_at?: string
                     url?: string | null
                     user_id?: string
                 }

@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
 export default function QuizCard({ title, difficulty, questions, onStart, action }: { title: string; difficulty: string; questions: number; onStart?: () => void; action?: ReactNode }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-      <Card className="rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
+      <Card className="rounded-2xl  border border-white/10 shadow-xl bg-[#112925]/50  hover:shadow-lg transition-all duration-300">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-[#2F5233] dark:text-[#DAF1DE]">
             <span>{title}</span>

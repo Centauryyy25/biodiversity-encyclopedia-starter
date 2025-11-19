@@ -88,7 +88,7 @@ export default function QuizRunner({ quizId, topic, difficulty }: { quizId: stri
 
   if (loading) {
     return (
-      <Card className="rounded-2xl">
+      <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
         <CardContent className="p-6">
           <div className="animate-pulse h-24 rounded-xl bg-muted" />
         </CardContent>
@@ -108,7 +108,7 @@ export default function QuizRunner({ quizId, topic, difficulty }: { quizId: stri
   if (finished) {
     const scorePct = Math.round((correctCount / total) * 100)
     return (
-      <Card className="rounded-2xl shadow-md">
+      <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
         <CardHeader>
           <CardTitle>Hasil Kuis</CardTitle>
         </CardHeader>
@@ -131,7 +131,7 @@ export default function QuizRunner({ quizId, topic, difficulty }: { quizId: stri
   const progress = total ? Math.round(((index) / total) * 100) : 0
 
   return (
-    <Card className="rounded-2xl shadow-md">
+    <Card className="rounded-2xl border border-white/10 shadow-xl bg-[#112925]/50">
       <CardHeader>
         <CardTitle className="text-[#2F5233] dark:text-[#DAF1DE]">Soal {index + 1} dari {total}</CardTitle>
       </CardHeader>

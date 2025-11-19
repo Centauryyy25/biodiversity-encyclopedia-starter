@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/client';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { sanitizeSearchTerm } from '@/lib/api/species-route-helpers';
 import type {
   Species,
@@ -20,7 +20,7 @@ import type {
   Database,
 } from '@/types/database.types';
 
-const supabase = createClient();
+const supabase = createServerSupabaseClient();
 type SpeciesRow = Tables<'species'>;
 type ConservationRow = Tables<'conservation_data'> | null;
 type SpeciesImageRow = Tables<'species_images'>;
@@ -179,7 +179,7 @@ export async function getSpeciesCatalogSnapshot(
   filters: SpeciesCatalogFilters = {}
 ): Promise<SpeciesCatalogResult> {
   const {
-    limit = 24,
+    limit = 12,
     offset = 0,
     featured = false,
     kingdom,
